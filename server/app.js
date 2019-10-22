@@ -11,16 +11,11 @@ const path         = require('path');
 const cors         = require('cors')
 
 
-// WHEN INTRODUCING USERS DO THIS:
-// INSTALL THESE DEPENDENCIES: passport-local, passport, bcryptjs, express-session
-// AND UN-COMMENT OUT FOLLOWING LINES:
 
 const session       = require('express-session');
 const passport      = require('passport');
 
 require('./configs/passport');
-
-// IF YOU STILL DIDN'T, GO TO 'configs/passport.js' AND UN-COMMENT OUT THE WHOLE FILE
 
 mongoose
   .connect(process.env.MONGO_URI, {useNewUrlParser: true})
@@ -51,12 +46,11 @@ app.use(require('node-sass-middleware')({
   dest: path.join(__dirname, 'public'),
   sourceMap: true
 }));
-      
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'hbs');
-app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
+
+app.use(express.static(path.join(__dirname, '../client/build')))
 
 // ADD SESSION SETTINGS HERE:
 app.use(session({
@@ -84,9 +78,13 @@ app.use(cors({
 
 const index = require('./routes/index');
 app.use('/', index);
-// app.use('/api/projects', require('./routes/project-routes'))
-// app.use('/api/tasks', require('./routes/task-routes'))
 app.use('/api/auth', require('./routes/auth-routes'))
 
+
+
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build/index.html'))
+})
 
 module.exports = app;
